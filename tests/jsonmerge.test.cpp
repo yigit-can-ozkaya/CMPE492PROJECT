@@ -1,24 +1,64 @@
-#include "bouncmpe/jsonmerge.hpp"
+#include "jsonCCL/jsonCCL.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Dummy Addition", "[core]") {
-  int a = 10;
-  int b = 12;
+#include <nlohmann/json.hpp>
 
-  int result = bouncmpe::add_two_integer(a, b);
-  int expected = 22;
+#include "iostream"
+
+
+using json = nlohmann::json;
+using namespace nlohmann::literals;
+
+using namespace std;
+
+TEST_CASE("Merge Operation", "[core]") {
+  json target = R"({
+                "key1": "v1", "key2": "a","key3": "c"
+            })"_json;
+
+  json patch = R"({
+       "key1": "v3"
+    })"_json;
+
+  json result = jsonCCL::jsonmerge(target,patch);
+  json expected = {{"key1", "v3"}, {"key2", "a"},{"key3", "c"}};
 
   REQUIRE(result == expected);
 }
 
-TEST_CASE("Merge Operation", "[core]") {
-  boost::json::value target = {{"key1", "v1"}, {"key2", "a"}};
-  boost::json::value patch = {{"key1", "v2"}};
+TEST_CASE("Get Path", "[core]") {
+  std::string expected = "/Users/yigitcanozkaya/Desktop/492project/CMPE492PROJECT/";
+  jsonCCL::setPath("/Users/yigitcanozkaya/Desktop/492project/CMPE492PROJECT/");
+  std::string result = jsonCCL::getPath();
+  REQUIRE(result == expected);
+}
 
-  boost::json::value result = bouncmpe::jsonmerge(target, patch);
-  boost::json::value expected = {{"key1", "v2"}, {"key2", "a"}};
+TEST_CASE("Read and Get Json", "[core]") {
+  jsonCCL::setPath("/Users/yigitcanozkaya/Desktop/492project/CMPE492PROJECT/");
+  jsonCCL::readJson("deneme.json");
+  json expected = R"({
+    "age": 30,
+    "car": {
+        "araba1": {
+            "araba5": "mercedes"
+        },
+        "araba2": "bmw"
+    },
+    "name": 3122
+})"_json;
+  json result = jsonCCL::getJson();
+  REQUIRE(result == expected);
+}
 
+TEST_CASE("Parse Merge Json", "[core]") {
+  jsonCCL::setPath("/Users/yigitcanozkaya/Desktop/492project/CMPE492PROJECT/");
+  jsonCCL::readJson("deneme.json");
+  nlohmann::json expected = R"({
+            "araba5": "mercedes"
+        })"_json;
+  jsonCCL::setValue("car" , {{"araba1",{{"araba5","mercedes"}}}, {"araba2","bmw"}});
+  nlohmann::json result = jsonCCL::getValue("araba1");
   REQUIRE(result == expected);
 }
 

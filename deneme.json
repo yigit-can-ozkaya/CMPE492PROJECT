@@ -1,0 +1,10 @@
+{
+    "age": 30,
+    "car": {
+        "araba1": {
+            "araba5": "mercedes"
+        },
+        "araba2": "bmw"
+    },
+    "name": 3122
+}
